@@ -33,9 +33,8 @@ class UserProfileController extends Controller
 	public function login(Request $request)
 	{
 		$response = array(
-				'api_token' => '' ,
-				"http_status_code" => 401,
-				'server_message' => 'No se pudo autenticar el usuario'
+				'body' => array() ,
+				'server_message' => 'Usuario/Contraseña inválidos'
 			);
 		try {
 			$credentials = $request->only('username', 'password');
@@ -46,16 +45,21 @@ class UserProfileController extends Controller
 				$user->api_token = Str::random(60);
 				$user->save();
 				//$response['api_token'] = Auth::user()->api_token ;
-	            $response['api_token'] = Auth::user()->api_token ;
-	            $response['http_status_code'] = 200 ;
-	            $response['server_message'] = "";
+	            $response['body']['api_token'] = Auth::user()->api_token ;
+	            $response['server_message'] = "Bienvenido " . $user->username;
 	          
+	        }
+	        else 
+	        {
+	        	throw new \Exception("Error Login", 1);
+	        	//return response()->json($response,$status = 404);
 	        }	
 		} catch (\Exception $e) {
-			return response()->json($response);
+			return response()->json($response,$status = 401);
+
 		}
 		
-        return response()->json($response);
+        return response()->json($response,$status = 200);
 	}
 
 	public function username()
